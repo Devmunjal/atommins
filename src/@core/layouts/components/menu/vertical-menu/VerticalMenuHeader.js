@@ -4,9 +4,12 @@ import { NavLink } from 'react-router-dom'
 
 // ** Third Party Components
 import { Disc, X, Circle } from 'react-feather'
+import './style.scss'
 
 // ** Config
 import themeConfig from '@configs/themeConfig'
+import logo from "../../../../../assets/images/assets/logo.png"
+import companyname from '../../../../../assets/images/assets/companyname.png'
 
 const VerticalMenuHeader = props => {
   // ** Props
@@ -44,11 +47,11 @@ const VerticalMenuHeader = props => {
     <div className='navbar-header'>
       <ul className='nav navbar-nav flex-row'>
         <li className='nav-item mr-auto'>
-          <NavLink to='/' className='navbar-brand'>
+          <NavLink to='/' className='navbar-brand logo' >
             <span className='brand-logo'>
-              <img src={themeConfig.app.appLogoImage} alt='logo' />
+              <img src={logo} alt='logo' />
             </span>
-            <h2 className='brand-text mb-0'>{themeConfig.app.appName}</h2>
+            <h2 className='brand-text mb-0'>ATOMIND</h2>
           </NavLink>
         </li>
         <li className='nav-item nav-toggle'>

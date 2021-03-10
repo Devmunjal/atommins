@@ -12,9 +12,12 @@ import {
   InputGroupAddon,
   InputGroupText,
   FormGroup,
-  Label
+  Label,
+  Table
 } from "reactstrap"
+import './newsletter.scss'
 import { X, Check, Trash } from "react-feather"
+import { Icon } from 'semantic-ui-react'
 
 function NewsLetter() {
   const [createNewsLetter, setcreateNewsLetter] = useState(false)
@@ -105,6 +108,16 @@ function NewsLetter() {
                     placeholder="Enter Description Of NewsLetter"
                   />
                 </FormGroup>
+                <FormGroup>
+                  <Label for="customer-subtitle" className="form-label">
+                    Sub Title
+                  </Label>
+                  <Input
+                    type="text"
+                    id="image-url"
+                    placeholder="Image-URL"
+                  />
+                </FormGroup>
                 <FormGroup className="d-flex flex-wrap mt-2">
                   <Button
                     className="mr-1"
@@ -138,6 +151,58 @@ function NewsLetter() {
           </div>
         </Col>
       </Row>
+    
+    
+    <Row >
+        <Col xl="6" xs="12" md="6">
+          <Button.Ripple
+            onClick={() => setcreateNewsLetter(true)}
+            color="success"
+            style={{ fontSize: "18px" }}
+          >
+            Manage NewsLetter
+          </Button.Ripple>
+        </Col>
+      </Row>
+
+    <Row className="card newsletter-table">
+    <Table hover>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>SubTitle</th>
+          <th>Image URL</th>
+          <th>Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>Mark</td>
+          <td>Otto</td>
+          <td>
+          <Icon name='edit' />
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>Jacob</td>
+          <td>Thornton</td>
+          <td>
+          <Icon name='edit' />
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>Larry</td>
+          <td>the Bird</td>
+          <td>
+          <Icon name='edit' />
+          </td>
+        </tr>
+      </tbody>
+    </Table>
+    </Row>
     </div>
   )
 }

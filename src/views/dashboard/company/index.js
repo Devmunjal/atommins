@@ -12,10 +12,12 @@ import {
   InputGroupAddon,
   InputGroupText,
   FormGroup,
-  Label
+  Label,
+  Table
 } from "reactstrap"
 import { X, Check, Trash } from "react-feather"
-
+import './company.scss'
+import { Icon } from 'semantic-ui-react'
 function Company() {
     const [createNewsLetter, setcreateNewsLetter] = useState(false)
     const CloseBtn = (
@@ -161,6 +163,56 @@ function Company() {
               </p>
             </div>
           </Col>
+        </Row>
+      
+        <Row>
+          <Col xl="6" xs="12" md="6">
+            <Button.Ripple
+              onClick={() => setcreateNewsLetter(true)}
+              color="success"
+              style={{ fontSize: "18px" }}
+            >
+              Manage Company
+            </Button.Ripple>
+          </Col>
+        </Row>
+        <Row className="manage-table card">
+        <Table hover>
+      <thead> 
+        <tr>
+          <th>Name</th>
+          <th>Contract Address</th>
+          <th>Price</th>
+          <th>Edit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">xyz</th>
+          <td>#24276697jgd73</td>
+          <td>$123</td>
+          <td>
+          <Icon name='edit' />
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">xyz</th>
+          <td>#24276697jgd73</td>
+          <td>$123</td>
+          <td>
+          <Icon name='edit' />
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">xyz</th>
+          <td>#24276697jgd73</td>
+          <td>$123</td>
+          <td>
+          <Icon name='edit' />
+          </td>
+        </tr>
+      </tbody>
+    </Table>
         </Row>
       </div>
     )
