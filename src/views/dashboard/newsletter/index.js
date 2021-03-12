@@ -226,9 +226,9 @@ function NewsLetter() {
             </h4>
           </div>}
     {ErrorCompany && <div className="card" style={{paddingTop:"15px", textAlign:"center"}}>
-            <h2>Loading</h2>
+            <h2>Loading ....</h2>
             <h4>
-              Please Wait .....
+              Please Wait
             </h4>
       </div>}
       {!NoData && !ErrorCompany && newsLetter.length > 0 &&  <thead>

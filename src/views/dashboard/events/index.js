@@ -29,6 +29,7 @@ function Events() {
   const [metaData, setmetaData] = useState("")
   const [companyid, setcompanyid] = useState(null)
   const [EventData, setEventData] = useState([])
+  const [NoData, setNoData] = useState(true)
   const CloseBtn = (
     <X
       className="cursor-pointer"
@@ -63,7 +64,9 @@ function Events() {
       .then((resp) => resp.json()).then(resp => { 
         if (resp.error) {
           setError(true)
+          setNoData(false)
         } else {
+          setNoData(false)
           setError(false)
           setEventData(resp.result)
         }
@@ -227,13 +230,17 @@ function Events() {
         </Col> */}
       </Row>
       <Row className="card event-table">
-        {Error && <div className="card" style={{paddingTop:"15px", textAlign:"center"}}>
+        {NoData && <div className="card" style={{paddingTop:"15px", textAlign:"center"}}>
+          <h2>Loading ...</h2>
+          <h4>Plaese Wait</h4>
+          </div>}
+        {!NoData && Error && <div className="card" style={{paddingTop:"15px", textAlign:"center"}}>
             <h2>No Events</h2>
             <h4>
               Please Click On Create Event To Create New Event
             </h4>
           </div>}
-    {!Error && EventData  && <Table hover>
+    {!NoData && !Error && EventData  && <Table hover>
       <thead>
         <tr>
           <th>Title</th>

@@ -1,62 +1,50 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {Row, Col, Button, Table} from 'reactstrap'
 function User() {
+    const [users, setusers] = useState([])
+    function getAllUsers() {
+      fetch('https://i6e6us62u7.execute-api.us-east-1.amazonaws.com/dev/allusers', {
+        headers:{
+          "Content-Type": "application/json",
+          "x-access-token": `${localStorage.getItem('token')}`
+        }
+      }).then(resp => resp.json()).then((resp) => setusers(resp.result))
+    }
+    useEffect(() => {
+      getAllUsers()
+      return () => { }
+    }, [])
     return (
         <div>
-                  <Row>
-          <Col xl="6" xs="12" md="6">
-            <Button.Ripple
-              // onClick={() => setcreateNewsLetter(true)}
-              color="success"
-              style={{ fontSize: "18px" }}
-            >
-              Manage User
-            </Button.Ripple>
-          </Col>
-        </Row>
-        <Row>
-          <Col xl="12" xs="12" md="12">
-            <div className="card" style={{marginTop:"10px", paddingLeft:"10px", paddingTop:"10px", cursor:"pointer" }}>
-              <h3>
-                  Name
-              </h3>
-              <p>
-                  Description
-              </p>
-            </div>
-          </Col>
-        </Row>
         <Row  className="card user-table">
         <Table hover>
-      <thead>
-        <tr>
-          <th>User Id</th>
-          <th>Name</th>
-          <th>Wallet Address</th>
-          
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Mark</td>
-          <td>xlkdjfoi#12</td>
-         
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Jacob</td>
-          <td>xlkdjfoi#12</td>
-          
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>Larry</td>
-          <td>xlkdjfoi#12</td>
-          
-        </tr>
-      </tbody>
-    </Table>
+            {
+              users && users.length === 0 && <div className="card" style={{textAlign:"center", paddingTop:"15px"}}>
+                <h2>No Users</h2>
+              </div>
+            }
+            {users && users.length > 0 && <thead>
+              <tr>
+                <th>Name</th>
+                <th>Wallet Address</th>
+                <th>Country</th>
+                <th>Email</th>
+              </tr>
+            </thead>}
+            {users && users.length > 0 && users.map((user) => {
+            return (<tbody>
+
+              <tr>
+                <th scope="row">{`${user.firstname} ${user.lastname}`}</th>
+                <td>{user.walletAddress}</td>
+                <td>{user.country}</td>
+                <td>{user.email}</td>
+              </tr>
+            </tbody> 
+            )
+          }
+            )}
+          </Table>
         </Row>
         </div>
     )
