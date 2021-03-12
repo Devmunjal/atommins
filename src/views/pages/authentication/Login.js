@@ -23,7 +23,7 @@ import {
   Button,
   UncontrolledTooltip
 } from 'reactstrap'
-
+import jwt from 'jsonwebtoken'
 import '@styles/base/pages/page-auth.scss'
 
 const ToastContent = ({ name, role }) => (
@@ -52,21 +52,80 @@ const Login = props => {
     source = require(`@src/assets/images/pages/${illustration}`).default
 
   const handleSubmit = (event, errors) => {
-    if (errors && !errors.length) {
-      useJwt
-        .login({ email, password })
-        .then(res => {
-          const data = { ...res.data.userData, accessToken: res.data.accessToken, refreshToken: res.data.refreshToken }
-          dispatch(handleLogin(data))
-          ability.update(res.data.userData.ability)
-          history.push(getHomeRouteForLoggedInUser(data.role))
-          toast.success(
-            <ToastContent name={data.fullName || data.username || 'John Doe'} role={data.role || 'admin'} />,
-            { transition: Slide, hideProgressBar: true, autoClose: 2000 }
-          )
-        })
-        .catch(err => console.log(err))
-    }
+    fetch('https://i6e6us62u7.execute-api.us-east-1.amazonaws.com/dev/login', {
+      method:"POST",
+      headers:{
+        'Content-Type': 'application/json',
+        Authorization:`Basic ${btoa(`${email}:${password}`)}` 
+      }
+    }).then(resp => resp.json()).then(resp => {
+      localStorage.setItem('token', resp.token)
+      fetch('https://i6e6us62u7.execute-api.us-east-1.amazonaws.com/dev/user', {
+        method:"GET",
+        headers:{
+          'Content-Type': 'application/json',
+          'x-access-token' : `${resp.token}`
+        }
+      }).then(resp => resp.json()).then(resp => {
+        if (resp.result.isAdmin) {
+          resp.result.ability =  [
+            {
+              action: 'manage',
+              subject: 'all'
+            }
+          ]
+          ability.update([
+            {
+              action: 'manage',
+              subject: 'all'
+            }
+          ])
+          history.push(getHomeRouteForLoggedInUser('admin'))
+        } else {
+          resp.result.ability = [
+            {
+              action: 'read',
+              subject: 'ACL'
+            },
+            {
+              action: 'read',
+              subject: 'Auth'
+            }
+          ]
+           ability.update([
+            {
+              action: 'read',
+              subject: 'ACL'
+            },
+            {
+              action: 'read',
+              subject: 'Auth'
+            }
+          ])
+          history.push(getHomeRouteForLoggedInUser('client'))
+        }
+        dispatch(handleLogin(resp.result))
+        toast.success(
+          <ToastContent name={resp.result.firstname + resp.result.lastname || 'John Doe'} role={resp.result.isAdmin  ? 'admin' : 'client'} />,
+          { transition: Slide, hideProgressBar: true, autoClose: 2000 }
+        )
+      })
+    })
+    // if (errors && !errors.length) {
+    //   useJwt
+    //     .login({ email, password })
+    //     .then(res => {
+    //       const data = { ...res.data.userData, accessToken: res.data.accessToken, refreshToken: res.data.refreshToken }
+    //       dispatch(handleLogin(data))
+    //       ability.update(res.data.userData.ability)
+    //       history.push(getHomeRouteForLoggedInUser(data.role))
+    //       toast.success(
+    //         <ToastContent name={data.fullName || data.username || 'John Doe'} role={data.role || 'admin'} />,
+    //         { transition: Slide, hideProgressBar: true, autoClose: 2000 }
+    //       )
+    //     })
+    //     .catch(err => console.log(err))
+    // }
   }
 
   return (

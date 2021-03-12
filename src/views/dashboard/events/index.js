@@ -21,6 +21,14 @@ import './events.scss'
 
 function Events() {
   const [createNewsLetter, setcreateNewsLetter] = useState(false)
+  const [Error, setError] = useState(true)
+  const [company, setcompany] = useState([])
+  const [date, setdate] = useState("")
+  const [title, settitle] = useState("")
+  const [description, setdescription] = useState("")
+  const [metaData, setmetaData] = useState("")
+  const [companyid, setcompanyid] = useState(null)
+  const [EventData, setEventData] = useState([])
   const CloseBtn = (
     <X
       className="cursor-pointer"
@@ -30,23 +38,72 @@ function Events() {
       }}
     />
   )
-  useEffect(() => {
-    fetch("http://127.0.0.1:5000/get_all_events", {
-      headers: {
+  function fetchAllcompanies() {
+    try {
+      fetch('https://i6e6us62u7.execute-api.us-east-1.amazonaws.com/dev/company', {
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": `${localStorage.getItem('token')}`
+        }
+      }).then((resp) => resp.json()).then(resp => { console.log(resp) })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  function fetchEventsData() {
+    try {
+      fetch("https://i6e6us62u7.execute-api.us-east-1.amazonaws.com/dev/event", {
+        headers: {
         "Content-Type": "application/json",
-        "x-access-token": ""
+        "x-access-token": `${localStorage.getItem('token')}`
       },
       method: "GET"
-    })
-      .then((resp) => resp.json)
-      .then((resp) => {
-        console.log(resp)
       })
+      .then((resp) => resp.json()).then(resp => { 
+        if (resp.error) {
+          setError(true)
+        } else {
+          setError(false)
+          setEventData(resp.result)
+        }
+        
+       })
+    } catch (err) {
+        console.log(err)
+      }
+  }
+  function createEvent() {
+    try {
+        const event = {
+          date,
+          title,
+          description,
+          metaData,
+          company:companyid
+        }
+        fetch("https://i6e6us62u7.execute-api.us-east-1.amazonaws.com/dev/event", {
+            headers: {
+              "Content-Type": "application/json",
+              "x-access-token": `${localStorage.getItem('token')}`
+            },
+            method: "POST",
+            body : JSON.stringify(event)
+        }).then(resp => { setcreateNewsLetter(false); fetchEventsData() })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  useEffect(() => {
+    const d = new Date()
+    const year = 
+    setdate(`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)
+    console.log(`${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)
+    fetchEventsData()
+    fetchAllcompanies()
     return () => {}
   }, [])
-  const createnewsLetter = () => {
-    console.log("hii")
-  }
+
   return (
     <div>
       <Row>
@@ -87,19 +144,19 @@ function Events() {
                   <Input
                     id="customer-name"
                     placeholder="Enter Title Of News Letter"
+                    onChange={e => settitle(e.target.value)}
                   />
                 </FormGroup>
                 <FormGroup>
                   <Label for="customer-subtitle" className="form-label">
                     Date
                   </Label>
-                  <Input type="date" id="customer-subtitle" />
+                  <Input onChange={e => setdate(e.target.value)} type="date" id="customer-subtitle" />
                 </FormGroup>
-                <FormGroup>
-                  <Label for="exampleSelect" sm={2}>
+                {/* <FormGroup>
+                  <Label for="exampleSelect" className="form-label">
                     Select
                   </Label>
-                  <Col sm={10}>
                     <Input type="select" name="select" id="exampleSelect">
                       <option>company1</option>
                       <option>company2</option>
@@ -107,8 +164,7 @@ function Events() {
                       <option>company4</option>
                       <option>company5</option>
                     </Input>
-                  </Col>
-                </FormGroup>
+                </FormGroup> */}
                 <FormGroup>
                   <Label for="customer-address" className="form-label">
                     Description
@@ -119,13 +175,14 @@ function Events() {
                     rows="2"
                     id="customer-address"
                     placeholder="Enter Description Of NewsLetter"
+                    onChange={e => setdescription(e.target.value)}
                   />
                 </FormGroup>
                 <FormGroup className="d-flex flex-wrap mt-2">
                   <Button
                     className="mr-1"
                     color="primary"
-                    onClick={() => createnewsLetter()}
+                    onClick={() => createEvent()}
                   >
                     Add
                   </Button>
@@ -142,7 +199,7 @@ function Events() {
           </Row>
         </ModalBody>
       </Modal>
-      <Row>
+      {/* <Row>
         <Col xl="12" xs="12" md="12">
           <div
             className="card"
@@ -157,9 +214,9 @@ function Events() {
             <p>Description</p>
           </div>
         </Col>
-      </Row>
+      </Row> */}
       <Row>
-        <Col xl="6" xs="12" md="6">
+        {/* <Col xl="6" xs="12" md="6">
           <Button.Ripple
             onClick={() => setcreateNewsLetter(true)}
             color="success"
@@ -167,45 +224,41 @@ function Events() {
           >
             Manage Events
           </Button.Ripple>
-        </Col>
+        </Col> */}
       </Row>
       <Row className="card event-table">
-    <Table hover>
+        {Error && <div className="card" style={{paddingTop:"15px", textAlign:"center"}}>
+            <h2>No Events</h2>
+            <h4>
+              Please Click On Create Event To Create New Event
+            </h4>
+          </div>}
+    {!Error && EventData  && <Table hover>
       <thead>
         <tr>
           <th>Title</th>
           <th>Date</th>
-          <th>Company Name</th>
+          <th>Description</th>
           <th>Edit</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>22/10/2020</td>
-          <td>Otto</td>
+        {!Error && EventData  && EventData.length > 0 && EventData.map((oneEvent) => {
+          console.log(oneEvent)
+          return (
+            <tr>
+          <th scope="row">{oneEvent.title}</th>
+          <td>{oneEvent.date}</td>
+          <td>{oneEvent.description}</td>
           <td>
           <Icon name='edit' />
           </td>
         </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>2/10/2020</td>
-          <td>Thornton</td>
-          <td>
-          <Icon name='edit' />
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>23/10/2020</td>
-          <td>the Bird</td>
-          <td>
-          <Icon name='edit' />
-          </td>
-        </tr>
+          )
+        })}
+        
       </tbody>
-    </Table>
+    </Table>}
     </Row>
     </div>
   )
